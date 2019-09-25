@@ -1,0 +1,48 @@
+# Load libraries
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn import datasets
+
+# Import train_test_split function
+from sklearn.model_selection import train_test_split
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+
+#Import scikit-learn metrics module for accuracy calculation
+from sklearn import metrics
+os.chdir('E:/Eller MBA/MIS 510/Project/Data')
+dataset = pd.read_csv('yellow_cab_upd_tcbor.csv')
+
+#USE THIS FOR ALGORITHM
+X = dataset[['passenger_count',
+'extra',
+'tolls_amount',
+'PRCP',
+'TMAX',
+'TMIN',
+'TAVG',
+'PULocationID',
+'DOLocationID',
+'do_borough_num',
+'trip_speed',
+'pickup_Hour',
+'pickup_Minute',
+'pickup_Second',
+'dropoff_Hour',
+'dropoff_Minute',
+'dropoff_Second',
+'time_of_day_num']]
+y = dataset['tip_category_num']
+
+dataset['trip_speed'] = pd.to_numeric(dataset['trip_speed'], errors='coerce')
+dataset['trip_speed'] = np.nan_to_num(dataset['trip_speed'])
+
+abc = AdaBoostClassifier(n_estimators=50,
+learning_rate=1)
+# Train Adaboost Classifer
+model = abc.fit(X_train, y_train)
+#Predict the response for test dataset
+y_pred = model.predict(X_test)
+
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
