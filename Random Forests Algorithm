@@ -1,0 +1,112 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+import os
+import pickle
+from sklearn.metrics import confusion_matrix
+from sklearn import metrics
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+os.chdir('E:/Eller MBA/MIS 510/Project/Data')
+dataset = pd.read_csv('yellow_cab_upd_tcbor.csv')
+
+
+#Managing Dataset Columns after determining the most relevant attributes
+
+del dataset ['dropoff_date']
+del dataset ['dropoff_time']
+del dataset ['total_amount']
+del dataset ['trip_distance']
+del dataset ['store_and_fwd_flag']
+del dataset ['tip_percentage']
+del dataset ['VendorID']
+del dataset ['RatecodeID']
+#del dataset ['PULocationID']
+#del dataset ['DOLocationID']
+del dataset ['payment_type']
+del dataset ['trip_duration']
+del dataset ['fare_amount']
+del dataset ['tip_amount']
+del dataset ['pickup_date']
+del dataset ['pu_borough']
+del dataset ['pu_zone']
+del dataset ['do_zone']
+del dataset ['do_borough']
+del dataset ['tip_category']
+del dataset ['PU_Latitude']
+del dataset ['time_of_day']
+
+dataset['trip_speed'] = pd.to_numeric(dataset['trip_speed'], errors='coerce')
+dataset['trip_speed'] = np.nan_to_num(dataset['trip_speed'])
+
+#recreating the dataset to be used with the Algorithm
+
+X = dataset[['passenger_count',
+'PULocationID',
+'DOLocationID',
+'do_borough_num',
+'trip_speed',
+'pickup_Hour',
+'pickup_Minute',
+'pickup_Second',
+'dropoff_Hour',
+'dropoff_Minute',
+'dropoff_Second',
+'time_of_day_num']]
+
+y = dataset['tip_category_num']
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25)
+
+#Create a Gaussian Classifier
+clf=RandomForestClassifier(n_estimators=100)
+
+#Train the model using the training sets y_pred=clf.predict(X_test)
+clf.fit(X_train,y_train)
+y_pred=clf.predict(X_test)
+
+filename = 'finalized_model_3.pkl'
+pickle.dump(clf, open(filename, 'wb'))
+
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+confusion_matrix(y_test, y_pred)
+
+X_features = ['passenger_count',
+'PULocationID',
+'DOLocationID',
+'do_borough_num',
+'trip_speed',
+'pickup_Hour',
+'pickup_Minute',
+'pickup_Second',
+'dropoff_Hour',
+'dropoff_Minute',
+'dropoff_Second',
+'time_of_day_num']
+
+import pandas as pd
+
+feature_imp = pd.Series(clf.feature_importances_,index=X_features).sort_values
+(ascending=False)
+feature_imp
+
+import seaborn as sns
+
+%matplotlib inline
+
+# Creating a bar plot
+sns.barplot(x=feature_imp, y=feature_imp.index)
+# Add labels to your graph
+plt.xlabel('Feature Importance Score')
+plt.ylabel('Features')
+plt.title("Visualizing Important Features")
+plt.legend()
+plt.show()
+
+
+
+
+
+
+
